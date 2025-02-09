@@ -1,9 +1,14 @@
 class LDA:
     def __init__(self, data, type_label, categories = []):
+        self.num_cat = len(categories)
+        self.num_var = len(data[0])
         if categories == []:
             categories = [t for t in type_label if t not in categories]
-        self._organized_data  = [[[]] for _ in range(len(categories))] #3-D array
+        self.organized_data  = [[[]] for _ in range(self.num_cat)] #3-D array
         self.reorganize_data(data, type_label, categories)
+
+        self.means = [[] for _ in range(len(categories))]
+        self.Sw_matrix = []
 
     # cluster the data set based on the classification rule provided
     def reorganize_data(self, data, type_label, categories = []):
@@ -11,18 +16,52 @@ class LDA:
         * MISSING: Exception Handling of length does not match
         * MISSING: Exception Handling of type in 'categories' is not in 'type_label'
         '''
-        for cat_index in range(len(categories)):
+        self.num_cat = len(categories)
+        self.num_var = len(data[0])
+        for cat_index in range(self.num_cat):
             cat = [data[data_index] for data_index in range(len(type_label)) if type_label[data_index] in categories[cat_index]]
-            self._organized_data[cat_index] = cat        
+            self.organized_data[cat_index] = cat
+        
+
+    # compute mean vector in each cluster
+    def compute_mean(self):
+        for cat_index in range(self.num_cat): 
+            cat = self.organized_data[cat_index]
+            cat_mean = [0 for _ in range(self.num_var)]
+            for var_index in range(self.num_var):
+                total = 0
+                for data_index in range(len(cat)):
+                    total += cat[data_index][var_index]
+                cat_mean[var_index] = total / len(cat) 
+            self.means[cat_index] = cat_mean
+
+    # compute within class scatter matrix
+    def compute_Sw(self):
+        self.Sw_matrix = [[self._compute_Swij(row, column) for column in range(self.num_var)] for row in range(self.num_var)]
+        """
+        for row in range(len(self.means[0])):
+            for column in range(len(self.means[0])):
+                self.Sw_matrix[row][column] = self._compute_Swij(row, column) 
+        """
+    #helper function for clarity
+    def _compute_Swij(self, row, column):
+        result = 0
+        for cat_index in range(self.num_cat):
+            cat = self.organized_data[cat_index]
+            cat_mean = self.means[cat_index]
+            for data_index in range(len(cat)):
+               result += (cat[data_index][row] - cat_mean[row])*(cat[data_index][column] - cat_mean[column])
+        return result
     
     # The instance of this class refers to the input data set
     def __str__(self):
         result = ''
-        for cat_index in range(len(self._organized_data)):
+        for cat_index in range(self.num_cat):
             result += "Categories " + str(cat_index) + ":\n"
-            cluster = self._organized_data[cat_index]
+            cluster = self.organized_data[cat_index]
             for sample in cluster:
                 result += str(sample) +"\n"
+            result += "Mean Vector of this cluster:\n" + str(self.means[cat_index]) +"\n"
             result += "\n"
         return result
     
@@ -39,4 +78,7 @@ if __name__ == "__main__":
               [1,0,1,0]
               ]
     obj = LDA(data_l, type_l, categories_list)
+    obj.compute_mean()
+    obj.compute_Sw()
     print(obj)
+    print(obj.Sw_matrix)
