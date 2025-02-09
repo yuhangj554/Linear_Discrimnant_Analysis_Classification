@@ -16,12 +16,18 @@ def determinant(matrix):
 def inverse(matrix, precision = 0.000001):
     width = len(matrix)
     result = [[0 for _ in range(width)] for _ in range(width)]
-    mat = matrix
-    det = determinant(mat)
+    det = determinant(matrix)
 
+    if det == 0:
+        matrix[0][0] += precision
+        for row in range(width):
+            for col in range(width):
+                matrix[row][col] += precision
+        det = determinant(matrix)
+    
     for row in range(width):
         for col in range(width):
-            sub_matrix = [(i[:col] + i[col+1:]) for i in (mat[:row]+mat[row+1:])]
+            sub_matrix = [(i[:col] + i[col+1:]) for i in (matrix[:row]+matrix[row+1:])]
             result[col][row] = ((-1)**(col+row)) * determinant(sub_matrix) / det
     
     return result
