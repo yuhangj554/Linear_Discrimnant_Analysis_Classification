@@ -1,26 +1,24 @@
 class LDA:
     def __init__(self, data, type_label, categories = []):
-        self.num_cat = len(categories)
-        self.num_var = len(data[0])
-        if categories == []:
-            categories = [t for t in type_label if t not in categories]
-        self.organized_data  = [[[]] for _ in range(self.num_cat)] #3-D array
-        self.reorganize_data(data, type_label, categories)
-
-        self.means = [[] for _ in range(len(categories))]
-        self.Sw_matrix = []
-
-    # cluster the data set based on the classification rule provided
-    def reorganize_data(self, data, type_label, categories = []):
         '''
         * MISSING: Exception Handling of length does not match
         * MISSING: Exception Handling of type in 'categories' is not in 'type_label'
         '''
+        if categories == []:
+            categories = [t for t in type_label if t not in categories]
         self.num_cat = len(categories)
         self.num_var = len(data[0])
+        self.organized_data  = [] #3-D array
+         # cluster the data set based on the classification rule provided
         for cat_index in range(self.num_cat):
             cat = [data[data_index] for data_index in range(len(type_label)) if type_label[data_index] in categories[cat_index]]
-            self.organized_data[cat_index] = cat
+            self.organized_data.append(cat)
+
+        self.means = []
+        self.Sw_matrix = []
+
+    def reset(self, data, type_label, categories = []):
+        self.__init__(data, type_label, categories = [])
         
 
     # compute mean vector in each cluster
@@ -33,7 +31,7 @@ class LDA:
                 for data_index in range(len(cat)):
                     total += cat[data_index][var_index]
                 cat_mean[var_index] = total / len(cat) 
-            self.means[cat_index] = cat_mean
+            self.means.append(cat_mean) 
 
     # compute within class scatter matrix
     def compute_Sw(self):
