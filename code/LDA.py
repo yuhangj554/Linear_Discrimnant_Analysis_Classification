@@ -5,7 +5,7 @@ class LDA:
         * MISSING: Exception Handling of type in 'categories' is not in 'type_label'
         '''
         if categories == []:
-            categories = [t for t in type_label if t not in categories]
+            categories = [[type_label[i]] for i in range(len(type_label)) if type_label[i] not in type_label[:i]]
         self.num_cat = len(categories)
         self.num_var = len(data[0])
         self.organized_data  = [] #3-D array
@@ -65,6 +65,7 @@ class LDA:
     
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
+    categories_list = []
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
