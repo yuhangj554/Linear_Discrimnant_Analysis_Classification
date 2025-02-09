@@ -1,3 +1,5 @@
+from tools import solution, inverse, normalize_vector
+
 class LDA:
     def __init__(self, data, type_label, categories = []):
         '''
@@ -16,6 +18,9 @@ class LDA:
 
         self.means = []
         self.Sw_matrix = []
+
+        self.catdiff = []
+        self.discriminant_vector = []
 
     def reset(self, data, type_label, categories = []):
         self.__init__(data, type_label, categories = [])
@@ -51,6 +56,21 @@ class LDA:
                result += (cat[data_index][row] - cat_mean[row])*(cat[data_index][column] - cat_mean[column])
         return result
     
+    # compute the distance in means of the two categories
+    # only used when there are only two categories
+    def compute_catdiff(self):
+        self.catdiff = [self.means[0][i] - self.means[1][i] for i in range(self.num_var)]
+    
+    
+    def compute_discriminant_vector(self):
+        if self.num_cat == 2:
+            self.compute_mean()
+            self.compute_Sw()
+            self.compute_catdiff()
+            self.discriminant_vector = solution(self.Sw_matrix, self.catdiff)
+            normalize_vector(self.discriminant_vector)
+        
+
     # The instance of this class refers to the input data set
     def __str__(self):
         result = ''
@@ -59,13 +79,13 @@ class LDA:
             cluster = self.organized_data[cat_index]
             for sample in cluster:
                 result += str(sample) +"\n"
-            result += "Mean Vector of this cluster:\n" + str(self.means[cat_index]) +"\n"
+            # result += "Mean Vector of this cluster:\n" + str(self.means[cat_index]) +"\n"
             result += "\n"
         return result
-    
+
+'''    
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
-    categories_list = []
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
@@ -77,7 +97,26 @@ if __name__ == "__main__":
               [1,0,1,0]
               ]
     obj = LDA(data_l, type_l, categories_list)
-    obj.compute_mean()
-    obj.compute_Sw()
+    obj.compute_discriminant_vector()
     print(obj)
     print(obj.Sw_matrix)
+    print(obj.catdiff)
+    print(obj.discriminant_vector)
+'''
+
+if __name__ == "__main__":
+    categories_list = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]]
+    type_l = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    data_l = [[1,5], [1,5], [1,5], [1,5], [1,5], [1,5], [1,5], [1,5], [1,5], [-1,-5]
+              , [1,5], [-1,-5], [-1,-5], [-1,-5], [-1,-5], [-1,-5], [-1,-5], [-1,-5], [-1,-5], [-1,-5]]
+    type2 = [1,1,2,2]
+    categories2 = [[1],[2]]
+    data2 = [[0,1], [3,4], [0, -1], [7,11]]
+    obj = LDA(data_l, type_l, categories_list)
+    obj2 = LDA(data2, type2, categories2)
+    obj.compute_discriminant_vector()
+    obj2.compute_mean()
+    obj2.compute_Sw()
+    obj2.compute_discriminant_vector()
+    print(obj2)
+    print(obj2.discriminant_vector)

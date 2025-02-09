@@ -13,16 +13,17 @@ def determinant(matrix):
     
     return det
 
-def inverse(matrix):
+def inverse(matrix, precision = 0.000001):
     width = len(matrix)
     result = [[0 for _ in range(width)] for _ in range(width)]
-    det = determinant(matrix)
+    mat = matrix
+    det = determinant(mat)
 
     for row in range(width):
         for col in range(width):
-            sub_matrix = [(i[:col] + i[col+1:]) for i in (matrix[:row]+matrix[row+1:])]
+            sub_matrix = [(i[:col] + i[col+1:]) for i in (mat[:row]+mat[row+1:])]
             result[col][row] = ((-1)**(col+row)) * determinant(sub_matrix) / det
-
+    
     return result
 
 def solution(matrix, vec):
@@ -35,12 +36,19 @@ def solution(matrix, vec):
             result[row] += inverse_mat[row][col] * vec[col]
 
     return result 
-    
 
+def normalize_vector(vec):
+    norm = 0
+    for value in vec:
+        norm += value ** 2
+    norm = norm ** 0.5
+    for i in range(len(vec)):
+        vec[i] /= norm
 
-matrix = [[1, 2, 3], [4, 9, 6], [7, 8, 9]]
-matrix1 = [[1,4], [3,6]]
-vec = [5,10,10]
-print(inverse(matrix))  
-print(inverse(matrix1))
-print(solution(matrix, vec))
+if __name__ == '__main__':
+    matrix = [[1, 2, 3], [4, 9, 6], [7, 8, 9]]
+    matrix1 = [[1,4], [3,6]]
+    vec = [5,10,10]
+    print(inverse(matrix))  
+    print(inverse(matrix1))
+    print(solution(matrix, vec))
