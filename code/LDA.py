@@ -25,6 +25,7 @@ class LDA:
         self.converted_data = []
         self.converted_means = []
         self.converted_stddev = []
+        self.marks = []
 
     def reset(self, data, type_label, categories = []):
         self.__init__(data, type_label, categories = [])
@@ -85,6 +86,29 @@ class LDA:
             self.converted_means = [inner_product(self.means[cat_index], self.discriminant_vector)
                                         for cat_index in range(self.num_cat)]
             
+    def compute_midpoints(self):
+        def _simpleSort(arr):
+            arr1 = arr.copy()
+            result = []
+            for i in range(len(arr1)):
+                j = i + 1
+                minimum  = arr1[i]
+                cat_index = i
+                while j < len(arr1):
+                    if arr1[j] < minimum:
+                        minimum, cat_index = arr1[j], j
+                    j += 1 
+                result.append([cat_index, minimum])
+                temp = arr1[i]
+                arr1[i] = arr1[cat_index]
+                arr1[cat_index] = temp
+            return result
+        
+        midpoints = _simpleSort(self.converted_means)
+        for i in range(len(midpoints)-1):
+            self.marks.append([i, (midpoints[i][1]+midpoints[i+1][1])/2])
+
+
 
     def compute_converted_stddev(self):
         for cat_index in range(self.num_cat):
@@ -124,10 +148,10 @@ class LDA:
             result += "\n"
         return result
 
-'''
+
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
-    categories_list = []
+    #categories_list = []
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
@@ -148,11 +172,13 @@ if __name__ == "__main__":
     obj.compute_converted_stddev()
     print(obj.converted_data)
     print(obj.converted_means)
+    obj.compute_midpoints()
+    print(obj.marks)
+
+
+
+
 '''
-
-
-
-
 if __name__ == "__main__":
     categories_list = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]]
     type_l = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
@@ -173,3 +199,6 @@ if __name__ == "__main__":
     print(obj2.converted_data)
     print(obj2.converted_means)
     print(obj2.converted_stddev)
+    obj2.compute_midpoints()
+    print(obj2.marks)
+''' 
