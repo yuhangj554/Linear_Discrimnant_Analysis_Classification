@@ -45,6 +45,12 @@ def normalize_vector(vec):
     for i in range(len(vec)):
         vec[i] /= norm
 
+def inner_product(vec1, vec2):
+    result = 0
+    for i in range (len(vec1)):
+        result += vec1[i] * vec2[i]
+    return result
+
 if __name__ == '__main__':
     matrix = [[1, 2, 3], [4, 9, 6], [7, 8, 9]]
     matrix1 = [[1,4], [3,6]]

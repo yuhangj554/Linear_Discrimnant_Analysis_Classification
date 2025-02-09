@@ -1,4 +1,4 @@
-from tools import solution, inverse, normalize_vector
+from tools import solution, inverse, normalize_vector, inner_product
 
 class LDA:
     def __init__(self, data, type_label, categories = []):
@@ -18,9 +18,13 @@ class LDA:
 
         self.means = []
         self.Sw_matrix = []
-
+        self.Sb_matrix = []
         self.catdiff = []
         self.discriminant_vector = []
+
+        self.converted_data = []
+        self.converted_means = []
+        self.converted_stddev = []
 
     def reset(self, data, type_label, categories = []):
         self.__init__(data, type_label, categories = [])
@@ -61,8 +65,9 @@ class LDA:
     def compute_catdiff(self):
         self.catdiff = [self.means[0][i] - self.means[1][i] for i in range(self.num_var)]
     
-    
-    def compute_discriminant_vector(self):
+    # train the discriminant vector for the dataset
+    # the projection of dataset onto this vector has greatest between class scatter and smallest within class scatter 
+    def train_discriminant_vector(self):
         if self.num_cat == 2:
             self.compute_mean()
             self.compute_Sw()
@@ -70,7 +75,40 @@ class LDA:
             self.discriminant_vector = solution(self.Sw_matrix, self.catdiff)
             normalize_vector(self.discriminant_vector)
         
+    # draw projection of each data point on to the discriminat vector    
+    def compute_converted_data(self):
+        for cat_index in range(self.num_cat):
+            self.converted_data.append([inner_product(self.organized_data[cat_index][i], self.discriminant_vector) 
+                                        for i in range(len(self.organized_data[cat_index]))])
 
+    def compute_converted_mean(self):
+            self.converted_means = [inner_product(self.means[cat_index], self.discriminant_vector)
+                                        for cat_index in range(self.num_cat)]
+            
+    def compute_converted_stddev(self):
+        for cat_index in range(self.num_cat):
+            deviation = 0
+            for data_index in range(len(self.converted_data[cat_index])):
+                deviation += (self.converted_data[cat_index][data_index] - self.converted_means[cat_index]) ** 2
+            deviation /= (len(self.converted_data[cat_index]) - 1) if len(self.converted_data[cat_index]) > 1 else 1
+            deviation = deviation ** 0.5
+            self.converted_stddev.append(deviation)
+
+        for cat_index in range(self.num_cat):
+            if self.converted_stddev[cat_index] != 0:
+                minimum = self.converted_stddev[cat_index]
+                count  = len(self.converted_data[cat_index])
+        for cat_index in range(self.num_cat):
+            if self.converted_stddev[cat_index] == 0:
+                continue
+            if self.converted_stddev[cat_index] < minimum:
+                minimum = self.converted_stddev[cat_index]
+                count = len(self.converted_data[cat_index])
+
+        for cat_index in range(self.num_cat):
+            if self.converted_stddev[cat_index] == 0:
+                self.converted_stddev[cat_index] = (minimum / count) ** (1/len(self.converted_data[cat_index]))
+        
     # The instance of this class refers to the input data set
     def __str__(self):
         result = ''
@@ -83,9 +121,10 @@ class LDA:
             result += "\n"
         return result
 
-'''    
+
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
+    categories_list = [['I'],  ["Y",'K', 'Q']]
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
@@ -97,13 +136,17 @@ if __name__ == "__main__":
               [1,0,1,0]
               ]
     obj = LDA(data_l, type_l, categories_list)
-    obj.compute_discriminant_vector()
+    obj.train_discriminant_vector()
     print(obj)
-    print(obj.Sw_matrix)
-    print(obj.catdiff)
     print(obj.discriminant_vector)
-'''
+    obj.compute_converted_data()
+    obj.compute_converted_mean()
+    obj.compute_converted_stddev()
+    print(obj.converted_data)
+    print(obj.converted_means)
+    print(obj.converted_stddev)
 
+'''
 if __name__ == "__main__":
     categories_list = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]]
     type_l = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
@@ -114,9 +157,12 @@ if __name__ == "__main__":
     data2 = [[0,1], [3,4], [0, -1], [7,11]]
     obj = LDA(data_l, type_l, categories_list)
     obj2 = LDA(data2, type2, categories2)
-    obj.compute_discriminant_vector()
-    obj2.compute_mean()
-    obj2.compute_Sw()
-    obj2.compute_discriminant_vector()
+    obj.train_discriminant_vector()
+    obj2.train_discriminant_vector()
+    obj2.compute_converted_data()
+    obj2.compute_converted_mean()
     print(obj2)
     print(obj2.discriminant_vector)
+    print(obj2.converted_data)
+    print(obj2.converted_means)
+'''
