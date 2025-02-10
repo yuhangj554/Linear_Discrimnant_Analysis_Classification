@@ -179,7 +179,7 @@ class LDA:
                     return result
             return result
         else:
-            zscores = [inner_product(data, self.classify_functions[i]) + self.classify_constants[i] for i in range(self.num_cat)]
+            zscores = [abs(inner_product(data, self.classify_functions[i]) + self.classify_constants[i]) for i in range(self.num_cat)]
             result = zscores.index(min(zscores))
             return result
 
@@ -223,6 +223,8 @@ if __name__ == "__main__":
     print(obj.converted_stddev)
 
     obj.classify_all(True)
+    print("functions: "+str(obj.classify_functions))
+    print("constants:"+str(obj.classify_constants))
     print(obj.result_table)
 
 
