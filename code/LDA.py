@@ -263,10 +263,12 @@ class LDA:
             print("Midpoints(Boundaries):")
             print("\t", end="")
             for i in range(len(self.marks)):
-                print("-------"+str(round(self.marks[i][1],4)), end="")
-            print("-------\n\t",end="")
+                print("_______"+str(round(self.marks[i][1],4)), end="")
+            print("_______\n\t",end="")
             for i in range(len(self.marks)):
                 print("   "+str(self.marks[i][0])+"         ", end="")
+                if (self.marks[i][1] < 0):
+                    print(" ", end="")
             print("   "+str(self.edge_category))
             print("\n" +"Plug a data point into the discriminant function. Its Category is determined by the area it falls into.")
         else:
@@ -297,7 +299,7 @@ class LDA:
 
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
-    categories_list = []
+    #categories_list = []
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
@@ -331,7 +333,7 @@ if __name__ == "__main__":
     print("Marks:\n" + str(obj.marks))
     print("converted data:\n" + str(obj.converted_data))
     '''
-    obj.classify_all(True)
+    obj.classify_all(False)
     obj.Classification_Result(True)
 
 
