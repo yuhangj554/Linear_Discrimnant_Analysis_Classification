@@ -7,14 +7,15 @@ class LDA:
         * MISSING: Exception Handling of length does not match
         * MISSING: Exception Handling of type in 'categories' is not in 'type_label'
         '''
+        self.categories = categories
         if categories == []:
-            categories = [[type_label[i]] for i in range(len(type_label)) if type_label[i] not in type_label[:i]]
-        self.num_cat = len(categories)
+            self.categories = [[type_label[i]] for i in range(len(type_label)) if type_label[i] not in type_label[:i]]
+        self.num_cat = len(self.categories)
         self.num_var = len(data[0])
         self.organized_data  = [] #3-D array
          # cluster the data set based on the classification rule provided
         for cat_index in range(self.num_cat):
-            cat = [data[data_index] for data_index in range(len(type_label)) if type_label[data_index] in categories[cat_index]]
+            cat = [data[data_index] for data_index in range(len(type_label)) if type_label[data_index] in self.categories[cat_index]]
             self.organized_data.append(cat)
 
         self.means = []
@@ -186,6 +187,7 @@ class LDA:
         if isStddev == False:
             self.compute_midpoints()
         else:
+            self.compute_converted_stddev()
             self.compute_classify_functions()
         
         for cat_index in range(len(self.organized_data)):
@@ -208,9 +210,78 @@ class LDA:
             zscores = [abs(inner_product(data, self.classify_functions[i]) + self.classify_constants[i]) for i in range(self.num_cat)]
             result = zscores.index(min(zscores))
             return result
+        
+    def Classification_Result(self, show_details = False):
+        correct_count = [0 for _ in range(self.num_cat)]
+
+        if show_details:
+            print("Detailed Classification of Every Data Point: ")
+            for cat_index in range(self.num_cat):
+                print("Category " + str(cat_index) + ": (includes types: " + str(self.categories[cat_index]) + ")")
+                cat = self.organized_data[cat_index]
+                cat_result = self.result_table[cat_index]
+                for data_index in range(len(cat)):
+                    if cat_result[data_index] == cat_index:
+                        judgement = True
+                        correct_count[cat_index] += 1
+                    else:
+                        judgement = False
+                    print(str(cat[data_index])+"\t"+str(cat_result[data_index])+"\t"+str(judgement))
+                print()
+        else:
+            for cat_index in range(self.num_cat):
+                for data_index in range(len(self.organized_data[cat_index])):
+                    if self.result_table[cat_index][data_index] == cat_index:
+                        correct_count[cat_index] += 1
+
+        accuracy_list = []
+        total_count = 0
+        for cat_index in range(self.num_cat):
+            accuracy_list.append(correct_count[cat_index]/len(self.organized_data[cat_index]))
+            total_count += len(self.organized_data[cat_index])
+        overall_accuracy = inner_product(correct_count, [1 for _ in range(self.num_cat)]) / total_count
+
+        print("Accuracy: ")
+        for cat_index in range(self.num_cat):
+            print("Category " + str(cat_index) + ": (includes types: " + str(self.categories[cat_index]) + ")")
+            print("Correct / total:\t" + str(correct_count[cat_index]) + " / " + str(len(self.organized_data[cat_index])))
+            print(str(round(accuracy_list[cat_index], 4)*100) +  "%")
+            print()
+        print("Overall Accuracy: " + str(round(overall_accuracy, 4)*100) +  "%")
+        print()
+
+        print("Classification Rules: ")
+        if not self.isStddev:
+            print("Discriminant Function: Midpoints")
+            print("\t", end="")
+            for var_index in range(self.num_var):
+                print(round(self.discriminant_vector[var_index], 4), "X" + str(var_index+1), end="")
+                if var_index < self.num_var-1:
+                    print(" + ", end="")
+            print()
+            print()
+            print("Midpoints(Boundaries):")
+            print("\t", end="")
+            for i in range(len(self.marks)):
+                print("-------"+str(round(self.marks[i][1],4)), end="")
+            print("-------\n\t",end="")
+            for i in range(len(self.marks)):
+                print("   "+str(self.marks[i][0])+"         ", end="")
+            print("   "+str(self.edge_category))
+            print("\n" +"Plug a data point into the discriminant function. Its Category is determined by the area it falls into.")
+        else:
+            print("Discriminant Functions: Z-scores")
+            for cat_index in range(self.num_cat):
+                print("\t", end="")
+                for var_index in range(self.num_var):
+                    print(round(self.classify_functions[cat_index][var_index], 4), "X" + str(var_index+1), end="")
+                    print(" + ", end="")
+                print(round(self.classify_constants[cat_index], 4))
+            print()
+            print("Plug a data point into each of the discriminant function. It would be classified to the category with the smallest function value.")
 
         
-    # The instance of this class refers to the input data set
+    # print the organized data set when called as str
     def __str__(self):
         result = ''
         for cat_index in range(self.num_cat):
@@ -237,6 +308,7 @@ if __name__ == "__main__":
               [1,0,1,0]
               ]
     obj = LDA(data_l, type_l, categories_list)
+    '''
     obj.compute_mean()
     obj.compute_Sb()
     obj.train_discriminant_vector()
@@ -257,6 +329,9 @@ if __name__ == "__main__":
 
     print("Marks:\n" + str(obj.marks))
     print("converted data:\n" + str(obj.converted_data))
+    '''
+    obj.classify_all(True)
+    obj.Classification_Result(True)
 
 
 '''
