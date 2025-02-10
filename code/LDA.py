@@ -1,4 +1,5 @@
 from tools import solution, inverse, normalize_vector, inner_product, multiply_by_scalar
+import numpy as np
 
 class LDA:
     def __init__(self, data, type_label, categories = []):
@@ -40,6 +41,7 @@ class LDA:
     # compute mean vector in each cluster
     def compute_mean(self):
         self.means = []
+        self.overall_mean = [0 for _ in range(self.num_var)]
         for cat_index in range(self.num_cat): 
             cat = self.organized_data[cat_index]
             cat_mean = [0 for _ in range(self.num_var)]
@@ -47,17 +49,15 @@ class LDA:
                 total = 0
                 for data_index in range(len(cat)):
                     total += cat[data_index][var_index]
+                self.overall_mean[var_index] += total
                 cat_mean[var_index] = total / len(cat) 
             self.means.append(cat_mean) 
+        self.overall_mean = multiply_by_scalar(self.overall_mean, 1/len(self.organized_data))
+        
 
     # compute within class scatter matrix
     def compute_Sw(self):
         self.Sw_matrix = [[self._compute_Swij(row, column) for column in range(self.num_var)] for row in range(self.num_var)]
-        """
-        for row in range(len(self.means[0])):
-            for column in range(len(self.means[0])):
-                self.Sw_matrix[row][column] = self._compute_Swij(row, column) 
-        """
     #helper function for clarity
     def _compute_Swij(self, row, column):
         result = 0
@@ -66,6 +66,18 @@ class LDA:
             cat_mean = self.means[cat_index]
             for data_index in range(len(cat)):
                result += (cat[data_index][row] - cat_mean[row])*(cat[data_index][column] - cat_mean[column])
+        return result
+
+    # compute between class scatter matrix
+    def compute_Sb(self):
+        self.Sb_matrix = [[self._compute_Sbij(row, column) for column in range(self.num_var)] for row in range(self.num_var)]
+    #helper function for clarity
+    def _compute_Sbij(self, row, column):
+        result = 0
+        for cat_index in range(self.num_cat):
+            cat_mean = self.means[cat_index]
+            result += (cat_mean[row] - self.overall_mean[row]) * (cat_mean[column] - self.overall_mean[column])
+            
         return result
     
     # compute the distance in means of the two categories
@@ -82,6 +94,21 @@ class LDA:
             self.compute_catdiff()
             self.discriminant_vector = solution(self.Sw_matrix, self.catdiff)
             normalize_vector(self.discriminant_vector)
+        else:
+            self.compute_mean()
+            self.compute_Sw()
+            self.compute_Sb()
+            inverse_Sw = inverse(self.Sw_matrix)
+            result_matrix = []
+            for row in range(self.num_var):
+                result_matrix.append([])
+                for col in range(self.num_var):
+                    vec = [self.Sb_matrix[i][col] for i in range(self.num_var)]
+                    result_matrix[row].append(inner_product(inverse_Sw[row], vec))
+            eigenvalues, eigenvectors = np.linalg.eig(np.array(result_matrix))
+            max_index = np.argmax(eigenvalues)
+            self.discriminant_vector = eigenvectors[:, max_index].tolist()
+
         
     # draw projection of each data point on to the discriminat vector    
     def compute_converted_data(self):
@@ -112,7 +139,6 @@ class LDA:
                 indexed_arr[pos] = temp
             return indexed_arr
 
-        
         ordered_means = _simpleSort(self.converted_means)
         self.edge_category = ordered_means[-1][0]
         for i in range(len(ordered_means)-1):
@@ -199,11 +225,11 @@ class LDA:
 
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
-    #categories_list = []
+    categories_list = []
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
-              [4,7,6,8],
+              [4,7,6,8], 
               [9,6,1,0],
               [2,7,3,0],
               [8,8,4,8],
@@ -211,6 +237,8 @@ if __name__ == "__main__":
               [1,0,1,0]
               ]
     obj = LDA(data_l, type_l, categories_list)
+    obj.compute_mean()
+    obj.compute_Sb()
     obj.train_discriminant_vector()
     print(obj.Sw_matrix)
     print(obj)
@@ -222,12 +250,13 @@ if __name__ == "__main__":
     print(obj.converted_means)
     print(obj.converted_stddev)
 
-    obj.classify_all(True)
+    obj.classify_all(False)
     print("functions: "+str(obj.classify_functions))
     print("constants:"+str(obj.classify_constants))
     print(obj.result_table)
 
-
+    print("Marks:\n" + str(obj.marks))
+    print("converted data:\n" + str(obj.converted_data))
 
 
 '''
