@@ -250,9 +250,9 @@ class LDA:
         print("Overall Accuracy: " + str(round(overall_accuracy, 4)*100) +  "%")
         print()
 
-        print("Classification Rules: ")
         if not self.isStddev:
-            print("Discriminant Function: Midpoints")
+            print("Classification Rules: Midpoints")
+            print("Discriminant Function:")
             print("\t", end="")
             for var_index in range(self.num_var):
                 print(round(self.discriminant_vector[var_index], 4), "X" + str(var_index+1), end="")
@@ -270,7 +270,8 @@ class LDA:
             print("   "+str(self.edge_category))
             print("\n" +"Plug a data point into the discriminant function. Its Category is determined by the area it falls into.")
         else:
-            print("Discriminant Functions: Z-scores")
+            print("Classification Rules: Z-scores")
+            print("Discriminant Functions: ")
             for cat_index in range(self.num_cat):
                 print("\t", end="")
                 for var_index in range(self.num_var):
