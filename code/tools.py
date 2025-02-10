@@ -18,6 +18,7 @@ def inverse(matrix, precision = 0.000001):
     result = [[0 for _ in range(width)] for _ in range(width)]
     det = determinant(matrix)
 
+
     if det == 0:
         matrix[0][0] += precision
         for row in range(width):
@@ -55,6 +56,12 @@ def inner_product(vec1, vec2):
     result = 0
     for i in range (len(vec1)):
         result += vec1[i] * vec2[i]
+    return result
+
+def multiply_by_scalar(vec, scalar):
+    result = []
+    for i in range(len(vec)):
+        result.append(vec[i] * scalar)
     return result
 
 if __name__ == '__main__':

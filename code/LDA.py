@@ -1,4 +1,4 @@
-from tools import solution, inverse, normalize_vector, inner_product
+from tools import solution, inverse, normalize_vector, inner_product, multiply_by_scalar
 
 class LDA:
     def __init__(self, data, type_label, categories = []):
@@ -25,7 +25,13 @@ class LDA:
         self.converted_data = []
         self.converted_means = []
         self.converted_stddev = []
+
         self.marks = []
+        self.edge_category = 0
+        self.classify_functions = []
+        self.classify_constants = []
+        self.isStddev = False
+        self.result_table = []
 
     def reset(self, data, type_label, categories = []):
         self.__init__(data, type_label, categories = [])
@@ -33,6 +39,7 @@ class LDA:
 
     # compute mean vector in each cluster
     def compute_mean(self):
+        self.means = []
         for cat_index in range(self.num_cat): 
             cat = self.organized_data[cat_index]
             cat_mean = [0 for _ in range(self.num_var)]
@@ -78,6 +85,7 @@ class LDA:
         
     # draw projection of each data point on to the discriminat vector    
     def compute_converted_data(self):
+        self.converted_data = []
         for cat_index in range(self.num_cat):
             self.converted_data.append([inner_product(self.organized_data[cat_index][i], self.discriminant_vector) 
                                         for i in range(len(self.organized_data[cat_index]))])
@@ -87,30 +95,31 @@ class LDA:
                                         for cat_index in range(self.num_cat)]
             
     def compute_midpoints(self):
+        self.marks = []
         def _simpleSort(arr):
-            arr1 = arr.copy()
-            result = []
-            for i in range(len(arr1)):
+            indexed_arr = [[i, arr[i]] for i in range(len(arr))]
+            for i in range(len(arr)):
                 j = i + 1
-                minimum  = arr1[i]
-                cat_index = i
-                while j < len(arr1):
-                    if arr1[j] < minimum:
-                        minimum, cat_index = arr1[j], j
-                    j += 1 
-                result.append([cat_index, minimum])
-                temp = arr1[i]
-                arr1[i] = arr1[cat_index]
-                arr1[cat_index] = temp
-            return result
+                minimum =  indexed_arr[i][1]
+                pos = i
+                while j < len(arr):
+                    if indexed_arr[j][1] < minimum:
+                        minimum = indexed_arr[j][1]
+                        pos = j
+                    j += 1
+                temp = indexed_arr[i]
+                indexed_arr[i] = indexed_arr[pos]
+                indexed_arr[pos] = temp
+            return indexed_arr
+
         
-        midpoints = _simpleSort(self.converted_means)
-        for i in range(len(midpoints)-1):
-            self.marks.append([i, (midpoints[i][1]+midpoints[i+1][1])/2])
-
-
+        ordered_means = _simpleSort(self.converted_means)
+        self.edge_category = ordered_means[-1][0]
+        for i in range(len(ordered_means)-1):
+            self.marks.append([ordered_means[i][0], (ordered_means[i][1]+ordered_means[i+1][1])/2])
 
     def compute_converted_stddev(self):
+        self.converted_stddev = []
         for cat_index in range(self.num_cat):
             deviation = 0
             for data_index in range(len(self.converted_data[cat_index])):
@@ -118,7 +127,7 @@ class LDA:
             deviation /= (len(self.converted_data[cat_index]) - 1) if len(self.converted_data[cat_index]) > 1 else 1
             deviation = deviation ** 0.5
             self.converted_stddev.append(deviation)
-
+        
         # edge cases where the stddev withn one or more categories is 0
         minimum = 1
         count = 2
@@ -135,6 +144,45 @@ class LDA:
         for cat_index in range(self.num_cat):
             if self.converted_stddev[cat_index] == 0:
                 self.converted_stddev[cat_index] = (minimum / count) ** (1/len(self.converted_data[cat_index]))
+    
+    def compute_classify_functions(self):
+        normalize_vector(self.converted_stddev)
+        self.classify_functions = [multiply_by_scalar(self.discriminant_vector, 1/self.converted_stddev[i]) for i in range(self.num_cat)]
+        self.classify_constants = [-self.converted_means[i] / self.converted_stddev[i] for i in range(self.num_cat)]
+
+    def classify_all(self, isStddev = False):
+        if self.discriminant_vector == []:
+            self.train_discriminant_vector()
+        self.isStddev = isStddev
+        self.compute_converted_data()
+        self.compute_converted_mean()
+        
+        if isStddev == False:
+            self.compute_midpoints()
+        else:
+            self.compute_classify_functions()
+        
+        for cat_index in range(len(self.organized_data)):
+            cat_result = []
+            for data_index in range(len(self.organized_data[cat_index])):
+                cat_result.append(self.classify_single(self.organized_data[cat_index][data_index]))
+            self.result_table.append(cat_result)
+
+    
+    def classify_single(self, data):
+        if self.isStddev == False:
+            converted_data = inner_product(data, self.discriminant_vector)
+            result = self.edge_category
+            for i in range(self.num_cat-1):
+                if converted_data < self.marks[i][1]:
+                    result =  self.marks[i][0]
+                    return result
+            return result
+        else:
+            zscores = [inner_product(data, self.classify_functions[i]) + self.classify_constants[i] for i in range(self.num_cat)]
+            result = zscores.index(min(zscores))
+            return result
+
         
     # The instance of this class refers to the input data set
     def __str__(self):
@@ -172,8 +220,10 @@ if __name__ == "__main__":
     obj.compute_converted_stddev()
     print(obj.converted_data)
     print(obj.converted_means)
-    obj.compute_midpoints()
-    print(obj.marks)
+    print(obj.converted_stddev)
+
+    obj.classify_all(True)
+    print(obj.result_table)
 
 
 
