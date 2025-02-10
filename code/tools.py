@@ -18,6 +18,10 @@ def inverse(matrix, precision = 0.000001):
     result = [[0 for _ in range(width)] for _ in range(width)]
     det = determinant(matrix)
 
+    if width == 1:
+        result = [[1/matrix[0][0]]]
+        return result
+
 
     if det == 0:
         matrix[0][0] += precision

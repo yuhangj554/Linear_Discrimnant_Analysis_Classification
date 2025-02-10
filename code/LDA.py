@@ -252,7 +252,7 @@ class LDA:
 
         if not self.isStddev:
             print("Classification Rules: Midpoints")
-            print("Discriminant Function:")
+            print("Discriminant Vector:")
             print("\t", end="")
             for var_index in range(self.num_var):
                 print(round(self.discriminant_vector[var_index], 4), "X" + str(var_index+1), end="")
@@ -270,9 +270,17 @@ class LDA:
                 if (self.marks[i][1] < 0):
                     print(" ", end="")
             print("   "+str(self.edge_category))
-            print("\n" +"Plug a data point into the discriminant function. Its Category is determined by the area it falls into.")
+            print("\n" +"Plug a data point into the discriminant vector. Its Category is determined by the area it falls into.")
         else:
             print("Classification Rules: Z-scores")
+            print("Discriminant Vector:")
+            print("\t", end="")
+            for var_index in range(self.num_var):
+                print(round(self.discriminant_vector[var_index], 4), "X" + str(var_index+1), end="")
+                if var_index < self.num_var-1:
+                    print(" + ", end="")
+            print()
+            print()
             print("Discriminant Functions: ")
             for cat_index in range(self.num_cat):
                 print("\t", end="")
@@ -310,12 +318,21 @@ if __name__ == "__main__":
               [9,6,1,9],             
               [1,0,1,0]
               ]
+    data_l = [[1],
+              [2],
+              [4], 
+              [9],
+              [2],
+              [8],
+              [9],             
+              [1]
+              ]
     obj = LDA(data_l, type_l, categories_list)
     '''
     obj.compute_mean()
     obj.compute_Sb()
+    print(inverse(obj.Sb_matrix))
     obj.train_discriminant_vector()
-    print(obj.Sw_matrix)
     print(obj)
     print(obj.discriminant_vector)
     obj.compute_converted_data()
@@ -333,7 +350,7 @@ if __name__ == "__main__":
     print("Marks:\n" + str(obj.marks))
     print("converted data:\n" + str(obj.converted_data))
     '''
-    obj.classify_all(False)
+    obj.classify_all(True)
     obj.Classification_Result(True)
 
 
