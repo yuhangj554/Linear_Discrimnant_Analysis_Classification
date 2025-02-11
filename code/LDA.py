@@ -1,5 +1,5 @@
-from tools import solution, inverse, normalize_vector, inner_product, multiply_by_scalar
 import numpy as np
+from tools import solution, inverse, normalize_vector, inner_product, multiply_by_scalar
 
 class LDA:
     def __init__(self, data, type_label, categories = []):
@@ -211,7 +211,7 @@ class LDA:
             result = zscores.index(min(zscores))
             return result
         
-    def Classification_Result(self, show_details = False):
+    def Classification_Result(self, show_details = False, file = None):
         correct_count = [0 for _ in range(self.num_cat)]
 
         if show_details:
@@ -318,6 +318,11 @@ if __name__ == "__main__":
               [9,6,1,9],             
               [1,0,1,0]
               ]
+    type_l = ["this", "that"]
+    data_l = [
+        [1,2],
+        [2,1]
+    ]
     obj = LDA(data_l, type_l, categories_list)
     '''
     obj.compute_mean()
