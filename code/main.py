@@ -63,6 +63,10 @@ if path != "m":
     isStddev = True if temp.strip() == "z" else False
     print()
 
+    lda.train_discriminant_vector()
+    lda.compute_converted_mean()
+    print(lda.converted_means)
+    print(lda.discriminant_vector)
     lda.classify_all(isStddev)
     lda.Classification_Result()
 

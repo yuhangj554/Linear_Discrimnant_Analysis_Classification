@@ -108,7 +108,7 @@ class LDA:
                     result_matrix[row].append(inner_product(inverse_Sw[row], vec))
             eigenvalues, eigenvectors = np.linalg.eig(np.array(result_matrix))
             max_index = np.argmax(eigenvalues)
-            self.discriminant_vector = eigenvectors[:, max_index].tolist()
+            self.discriminant_vector = eigenvectors.real[:, max_index].tolist()
 
         
     # draw projection of each data point on to the discriminat vector    
@@ -307,7 +307,7 @@ class LDA:
 
 if __name__ == "__main__":
     categories_list = [['Y', 'I'],  ['K', 'Q']]
-    #categories_list = []
+    categories_list = []
     type_l = ['Y','K', 'K', 'Y', 'K', 'Q', 'Q', 'I']
     data_l = [[1,2,3,4],
               [2,2,3,4],
@@ -317,15 +317,6 @@ if __name__ == "__main__":
               [8,8,4,8],
               [9,6,1,9],             
               [1,0,1,0]
-              ]
-    data_l = [[1],
-              [2],
-              [4], 
-              [9],
-              [2],
-              [8],
-              [9],             
-              [1]
               ]
     obj = LDA(data_l, type_l, categories_list)
     '''

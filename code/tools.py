@@ -15,27 +15,47 @@ def determinant(matrix):
 
 def inverse(matrix, precision = 0.000001):
     width = len(matrix)
-    result = [[0 for _ in range(width)] for _ in range(width)]
-    det = determinant(matrix)
+    if width <= 7:
+        result = [[0 for _ in range(width)] for _ in range(width)]
+        det = determinant(matrix)
 
-    if width == 1:
-        result = [[1/matrix[0][0]]]
-        return result
+        if width == 1:
+            result = [[1/matrix[0][0]]]
+            return result
 
 
-    if det == 0:
-        matrix[0][0] += precision
+        if det == 0:
+            matrix[0][0] += precision
+            for row in range(width):
+                for col in range(width):
+                    matrix[row][col] += precision
+            det = determinant(matrix)
+        
         for row in range(width):
             for col in range(width):
-                matrix[row][col] += precision
-        det = determinant(matrix)
-    
-    for row in range(width):
-        for col in range(width):
-            sub_matrix = [(i[:col] + i[col+1:]) for i in (matrix[:row]+matrix[row+1:])]
-            result[col][row] = ((-1)**(col+row)) * determinant(sub_matrix) / det
-    
-    return result
+                sub_matrix = [(i[:col] + i[col+1:]) for i in (matrix[:row]+matrix[row+1:])]
+                result[col][row] = ((-1)**(col+row)) * determinant(sub_matrix) / det
+        
+        return result
+    else:
+        i_mat = [[1 if row == col else 0 for col in range(width)] 
+                for row in range(width)
+        ]
+        for row in range(width):
+            for row_e in range(width):
+                if row == row_e:
+                    continue
+                if matrix[row][row] == 0:
+                   matrix[row][row] += precision
+                multiple = matrix[row_e][row] / matrix[row][row]
+                for col in range(width):
+                    matrix[row_e][col] -= multiple*matrix[row][col]
+                    i_mat[row_e][col] -= multiple*i_mat[row][col]
+                coeff = matrix[row][row]
+                for col in range(width):
+                    matrix[row][col] /= coeff
+                    i_mat[row][col] /= coeff
+        return i_mat
 
 def solution(matrix, vec):
     inverse_mat = inverse(matrix)
