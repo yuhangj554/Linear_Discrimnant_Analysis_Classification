@@ -1,0 +1,51 @@
+All variables: ['MBS', 'VSN', 'CSN', 'GSN', 'FPNr', 'SDLr', 'SCSr', 'SCGr', 'SMr', 'MTr', 'PA', 'PTMr', 'aNDSr', 'SVL', 'TRL', 'HL', 'PL', 'ESD', 'HW', 'HH', 'MO', 'FFL', 'HFL']
+Variables selected: ['MBS', 'VSN', 'CSN', 'GSN', 'FPNr']
+
+All types:{'1', '5', '7', '4', '6', '8', '3', '2'}
+
+Classification method used: Midpoints
+
+Accuracy: 
+Category 0: (includes types: ['1'])
+Correct / total:	5 / 24
+20.830000000000002%
+
+Category 1: (includes types: ['2'])
+Correct / total:	5 / 17
+29.409999999999997%
+
+Category 2: (includes types: ['4'])
+Correct / total:	13 / 45
+28.89%
+
+Category 3: (includes types: ['3'])
+Correct / total:	31 / 42
+73.81%
+
+Category 4: (includes types: ['5'])
+Correct / total:	13 / 13
+100.0%
+
+Category 5: (includes types: ['6'])
+Correct / total:	80 / 120
+66.67%
+
+Category 6: (includes types: ['7'])
+Correct / total:	20 / 22
+90.91%
+
+Category 7: (includes types: ['8'])
+Correct / total:	1 / 6
+16.669999999999998%
+
+Overall Accuracy: 58.13%
+
+Classification Rules: Midpoints
+Discriminant Vector:
+	0.372 X1 + 0.7777 X2 + 0.3534 X3 + 0.0633 X4 + 0.3576 X5
+
+Midpoints(Boundaries):
+	_______42.1721_______46.1007_______47.8961_______48.937_______49.8175_______50.4336_______52.1218_______
+	   4            3            5            1            2            0            7            6
+
+Plug a data point into the discriminant vector. Its Category is determined by the area it falls into.

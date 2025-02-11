@@ -1,0 +1,7 @@
+../data/All_lizards.csv
+!
+2
+2_F, 2_M
+'7_F', '3_M', '4_M', '5_M', '5_F', '8_M', '4_F', '1_F', '1_M', '6_F', '8_F', '3_F'
+z
+../examples/output1.txt

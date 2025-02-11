@@ -1,0 +1,75 @@
+All variables: ['MBS', 'VSN', 'CSN', 'GSN', 'FPNr', 'SDLr', 'SCSr', 'SCGr', 'SMr', 'MTr', 'PA', 'PTMr', 'aNDSr', 'SVL', 'TRL', 'HL', 'PL', 'ESD', 'HW', 'HH', 'MO', 'FFL', 'HFL']
+Variables selected: ['MBS', 'VSN', 'CSN', 'GSN', 'FPNr', 'SDLr', 'SCSr', 'SCGr', 'SMr', 'MTr', 'PA', 'PTMr', 'aNDSr', 'SVL', 'TRL', 'HL', 'PL', 'ESD', 'HW', 'HH', 'MO', 'FFL', 'HFL']
+
+All types:{'1_F', '1_M', '4_M', '3_M', '5_M', '2_F', '4_F', '3_F', '8_M', '8_F', '7_F', '5_F', '6_F', '2_M'}
+
+Classification method used: Midpoints
+
+Accuracy: 
+Category 0: (includes types: ['1_F'])
+Correct / total:	3 / 24
+12.5%
+
+Category 1: (includes types: ['2_F'])
+Correct / total:	3 / 17
+17.65%
+
+Category 2: (includes types: ['4_F'])
+Correct / total:	9 / 45
+20.0%
+
+Category 3: (includes types: ['3_F'])
+Correct / total:	26 / 42
+61.9%
+
+Category 4: (includes types: ['5_F'])
+Correct / total:	10 / 13
+76.92%
+
+Category 5: (includes types: ['6_F'])
+Correct / total:	27 / 120
+22.5%
+
+Category 6: (includes types: ['7_F'])
+Correct / total:	19 / 22
+86.36%
+
+Category 7: (includes types: ['8_F'])
+Correct / total:	1 / 6
+16.669999999999998%
+
+Category 8: (includes types: ['1_M'])
+Correct / total:	3 / 42
+7.140000000000001%
+
+Category 9: (includes types: ['2_M'])
+Correct / total:	0 / 46
+0.0%
+
+Category 10: (includes types: ['3_M'])
+Correct / total:	16 / 114
+14.04%
+
+Category 11: (includes types: ['4_M'])
+Correct / total:	4 / 48
+8.33%
+
+Category 12: (includes types: ['5_M'])
+Correct / total:	8 / 11
+72.72999999999999%
+
+Category 13: (includes types: ['8_M'])
+Correct / total:	0 / 14
+0.0%
+
+Overall Accuracy: 22.869999999999997%
+
+Classification Rules: Midpoints
+Discriminant Vector:
+	0.1697 X1 + 0.4937 X2 + 0.191 X3 + 0.0301 X4 + 0.0807 X5 + 0.1316 X6 + 0.1131 X7 + 0.0217 X8 + -0.035 X9 + 0.0332 X10 + 0.1293 X11 + 0.122 X12 + 0.7317 X13 + 0.015 X14 + -0.0507 X15 + 0.0451 X16 + 0.2207 X17 + -0.0028 X18 + 0.0139 X19 + -0.1504 X20 + 0.024 X21 + 0.0105 X22 + 0.0813 X23
+
+Midpoints(Boundaries):
+	_______30.0817_______32.3732_______34.4603_______34.6888_______34.9561_______35.2202_______35.3317_______35.8662_______36.5265_______36.7422_______36.9169_______37.0176_______37.6236_______
+	   12            4            3            10            5            13            9            1            2            11            0            8            7            6
+
+Plug a data point into the discriminant vector. Its Category is determined by the area it falls into.

@@ -1,0 +1,7 @@
+m
+this, 1, 2
+that, 2, 1
+!
+!
+m
+../examples/output7.txt

@@ -1,0 +1,5 @@
+../data/All_lizards.csv
+!
+!
+m
+../examples/output6.txt

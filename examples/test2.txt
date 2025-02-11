@@ -1,0 +1,5 @@
+../data/Female_lizards.csv
+'MBS', 'VSN', 'CSN', 'GSN', 'FPNr'
+!
+m
+../examples/output2.txt

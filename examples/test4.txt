@@ -1,0 +1,5 @@
+../data/Female_lizards.csv
+!
+!
+z
+../examples/output4.txt
