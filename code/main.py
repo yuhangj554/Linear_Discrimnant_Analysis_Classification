@@ -1,5 +1,5 @@
 import csv
-import LDA
+from LDA import LDA
 
 print("Enter the path of the file: ('m' for manual data entry)")
 path = input() # ../data/Female_lizards.csv
@@ -30,6 +30,7 @@ if path != "m":
             type_labels.append(row[0])
             all_types.add(row[0])
 
+
     print("\nEnter the number of categories you wish to classify the dataset into, at least 2: ('!' to ignore)")
     temp = input()
     categories = []
@@ -47,7 +48,24 @@ if path != "m":
                 includes_list[i] =  includes_list[i][:-1] if includes_list[i][-1] == "\'" else includes_list[i]
                 if includes_list[i] not in all_types:
                     raise ValueError(str(includes_list[i])+" is not in the types listed in the input file.")
-                categories.append(includes_list)
-        print(categories)
-        
+            categories.append(includes_list)
+    lda = LDA(data = data, type_label = type_labels, categories = categories)
+    print("\nDataset loaded successfully!")
+    
+    print(
+        "\nSelect the classification method you wish to use:"+
+        "\n* 'm' for midpoint method: midpoint method is simpler and more concise(by default)"+
+        "\n* 'z' for z-score method: assume the dataset is normally distributed; better prediction on large dataset,"+
+        "\n\t but with more complicated rules."+
+        "\n>", end=""
+    )
+    temp = input()
+    isStddev = True if temp.strip() == "z" else False
+    print()
+
+    lda.classify_all(isStddev)
+    lda.Classification_Result()
+
+    print("\nEnter the path of the output file: ")
+    
  
